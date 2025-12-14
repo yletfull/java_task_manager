@@ -20,15 +20,24 @@ public class Manager {
         this.tasks = new HashMap<>();
         this.lastId = 0;
 
-        try {
-            this.loadFile(Path.of("data", "tasks.bin"));
-        } catch (IOException | ClassNotFoundException e) {
-            throw new RuntimeException(e);
-        }
+//        try {
+//            loadFile(Path.of("data", "tasks.bin"));
+//        } catch (IOException | ClassNotFoundException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 
     public List<Task> getTasksByType(TaskType taskType) {
         return this.tasks.getOrDefault(taskType, new ArrayList<>());
+    }
+
+    public List<Task> getTaskById(Integer id) {
+        List<Task> tasks = new ArrayList<>();
+        for(TaskType taskType : this.tasks.keySet()) {
+            List<Task> tasksByType = this.tasks.get(taskType);
+            tasks.addAll(tasksByType);
+        }
+        return tasks;
     }
 
     public void setTasksByType(TaskType taskType, List<Task> tasks) {
@@ -79,12 +88,17 @@ public class Manager {
 
     @SuppressWarnings("unchecked")
     public void loadFile(Path file) throws IOException, ClassNotFoundException {
+        Path parent = file.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent);
+        }
+
         try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file.toFile()))) {
             this.tasks = (Map<Manager.TaskType, List<Task>>) in.readObject();
         }
     }
 
     public int generateId() {
-        return ++this.lastId;
+        return this.lastId++;
     }
 }

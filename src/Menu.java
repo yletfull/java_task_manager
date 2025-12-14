@@ -125,6 +125,18 @@ public class Menu {
         printMenu();
     }
 
+    public List<Task> getResultEpicSubtasks() {
+        printGetEpicSubtasksIds();
+        String inputTasksIds = this.scanner.nextLine();
+        List<Task> resultSubtasks = new ArrayList<>();
+        Set<String> parsedTasksIds = new HashSet<>(Arrays.asList(inputTasksIds.split("\\s,\\s*")));
+        for(String id : parsedTasksIds) {
+            List<Task> task = this.manager.getTaskById(Integer.getInteger(id));
+            resultSubtasks.addAll(task);
+        }
+        return resultSubtasks;
+    }
+
     public void createTask() {
         printTaskTypeSelectionMenu();
         int inputType = this.scanner.nextInt();
@@ -144,12 +156,8 @@ public class Menu {
                 newTask = new Task(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());
                 break;
             case EPIC:
-                printGetEpicSubtasksIds();
-                String inputTasksIds = this.scanner.nextLine();
-                String[] parsedTasksIds = inputTasksIds.split(",");
-
-                Map<Manager.TaskType, List<Task>> allTasks = this.manager.getAllTasks();
-//                newTask = new Epic(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId(), parsedTasksIds, );
+                List<Task> resultSubtasks = getResultEpicSubtasks();
+                newTask = new Epic(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId(), resultSubtasks);
                 break;
             case SUBTASK:
                 newTask = new Subtask(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());

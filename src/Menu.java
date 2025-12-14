@@ -1,7 +1,6 @@
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Scanner;
+import java.io.IOException;
+import java.nio.file.Path;
+import java.util.*;
 
 public class Menu {
     public class MenuItem {
@@ -38,6 +37,8 @@ public class Menu {
         this.menuItems.add(new MenuItem("4) Создание задачи", this::createTask));
         this.menuItems.add(new MenuItem("5) Удаление задачи по id", this::getAllTasksByType));
         this.menuItems.add(new MenuItem("6) Получение подзадач эпика", this::getAllTasksByType));
+        this.menuItems.add(new MenuItem("7) Сохранить файл", this::saveFile));
+        this.menuItems.add(new MenuItem("8) Загрузить файл", this::loadFile));
     }
 
     public void printMenu() {
@@ -68,6 +69,34 @@ public class Menu {
 
     private void printTaskStatusSelectionMenu() {
         System.out.println("Выберите статус задачи: \n 1) Новая \n 2) В работе \n 3) Выполнена");
+    }
+
+    private void printTaskSuccessAdd() {
+        System.out.println("Задача успешно добавлена");
+    }
+
+    private void printGetEpicSubtasksIds() {
+        System.out.println("Введите номера задач, включенных в Epic");
+    }
+
+    private void saveFile() {
+        try {
+            this.manager.saveFile(Path.of("data", "tasks.bin"));
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        printMenu();
+    }
+
+    private void loadFile() {
+        try {
+            this.manager.loadFile(Path.of("data", "tasks.bin"));
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
+
+        printMenu();
     }
 
     public void getAllTasksByType() {
@@ -108,19 +137,28 @@ public class Menu {
         printTaskDescriptionSelectionMenu();
         String inputDescription = this.scanner.nextLine();
 
-        Task newTask;
+        Task newTask = null;
 
         switch (tasksType) {
             case TASK:
                 newTask = new Task(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());
                 break;
             case EPIC:
-                newTask = new Epic(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());
+                printGetEpicSubtasksIds();
+                String inputTasksIds = this.scanner.nextLine();
+                String[] parsedTasksIds = inputTasksIds.split(",");
+
+                Map<Manager.TaskType, List<Task>> allTasks = this.manager.getAllTasks();
+//                newTask = new Epic(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId(), parsedTasksIds, );
                 break;
             case SUBTASK:
-                newTask = new Task(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());
+                newTask = new Subtask(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());
                 break;
         }
+
+        manager.addTask(tasksType, newTask);
+        printTaskSuccessAdd();
+        printMenu();
     }
 
     public void exitAppWithCode(int code) {

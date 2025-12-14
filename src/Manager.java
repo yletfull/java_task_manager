@@ -1,3 +1,6 @@
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +19,12 @@ public class Manager {
     public Manager() {
         this.tasks = new HashMap<>();
         this.lastId = 0;
+
+        try {
+            this.loadFile(Path.of("data", "tasks.bin"));
+        } catch (IOException | ClassNotFoundException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public List<Task> getTasksByType(TaskType taskType) {
@@ -33,14 +42,14 @@ public class Manager {
     public void addTask(TaskType taskType, Task task) {
         List<Task> list = this.tasks.get(taskType);
 
-        if(list == null) {
+        if (list == null) {
             list = new ArrayList<>();
             this.tasks.put(taskType, list);
         }
         list.add(task);
     }
 
-    public TaskType getTaskTypeByNumber (int number) {
+    public TaskType getTaskTypeByNumber(int number) {
         switch (number) {
             case 1:
                 return TaskType.TASK;
@@ -51,9 +60,31 @@ public class Manager {
             default:
                 return TaskType.TASK;
         }
-    };
+    }
 
-    public int generateId () {
+
+    public Map<TaskType, List<Task>> getAllTasks() {
+        return this.tasks;
+    }
+
+    public void saveFile(Path file) throws IOException {
+        Path parent = file.getParent();
+        if (parent != null) {
+            Files.createDirectories(parent); // создаст /data или data если нет
+        }
+        try (ObjectOutputStream out = new ObjectOutputStream(new FileOutputStream(file.toFile()))) {
+            out.writeObject(this.tasks);
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    public void loadFile(Path file) throws IOException, ClassNotFoundException {
+        try (ObjectInputStream in = new ObjectInputStream(new FileInputStream(file.toFile()))) {
+            this.tasks = (Map<Manager.TaskType, List<Task>>) in.readObject();
+        }
+    }
+
+    public int generateId() {
         return ++this.lastId;
     }
 }

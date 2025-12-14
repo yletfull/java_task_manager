@@ -1,5 +1,6 @@
+import java.io.Serializable;
 
-public class Task {
+public class Task implements Serializable {
     public enum TaskStatus {
         NEW,
         IN_PROGRESS,
@@ -17,14 +18,24 @@ public class Task {
 
     public Task(TaskStatus status, String name, String description, int id) {
         this.status = status;
+        this.name = name;
+        this.description = description;
     }
 
-
-    public TaskStatus getStatus () {
+    public TaskStatus getStatus() {
         return this.status;
     }
 
-    public void setStatus (TaskStatus status) {
+    public void setStatus(TaskStatus status) {
         this.status = status;
+    }
+
+    public int getTaskId() {
+        return this.id;
+    }
+
+    @Override
+    public String toString() {
+        return "\n ____" + "\n Имя: " + this.name + "\n Описание:" + this.description + "\n Id:" + this.id + "\n Status:" + this.status;
     }
 }

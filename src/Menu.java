@@ -76,7 +76,11 @@ public class Menu {
     }
 
     private void printGetEpicSubtasksIds() {
-        System.out.println("Введите номера задач, включенных в Epic");
+        System.out.println("Введите id задач, включенных в Epic");
+    }
+
+    private void printGetParentEpicId() {
+        System.out.println("Введите id Epic");
     }
 
     private void saveFile() {
@@ -131,10 +135,17 @@ public class Menu {
         List<Task> resultSubtasks = new ArrayList<>();
         Set<String> parsedTasksIds = new HashSet<>(Arrays.asList(inputTasksIds.split("\\s,\\s*")));
         for(String id : parsedTasksIds) {
-            List<Task> task = this.manager.getTaskById(Integer.getInteger(id));
-            resultSubtasks.addAll(task);
+            Task task = this.manager.getTaskById(Integer.getInteger(id));
+            resultSubtasks.add(task);
         }
         return resultSubtasks;
+    }
+
+    public Epic getParentEpic() {
+        printGetParentEpicId();
+        String inputParentEpicId = this.scanner.nextLine();
+        Task parentEpic = this.manager.getTaskById(Integer.getInteger(inputParentEpicId));
+        return (Epic) parentEpic;
     }
 
     public void createTask() {
@@ -160,7 +171,8 @@ public class Menu {
                 newTask = new Epic(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId(), resultSubtasks);
                 break;
             case SUBTASK:
-                newTask = new Subtask(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());
+                Epic parentEpic = getParentEpic();
+                newTask = new Subtask(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId(), parentEpic);
                 break;
         }
 

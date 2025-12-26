@@ -36,6 +36,14 @@ public class Task implements Serializable {
         return this.id;
     }
 
+    public String getDescription() {
+        return this.description;
+    }
+
+    public String getName() {
+        return this.name;
+    }
+
     @Override
     public String toString() {
         return "\n ____" + "\n Имя: " + this.name + "\n Описание:" + this.description + "\n Id:" + this.id + "\n Status:" + this.status;

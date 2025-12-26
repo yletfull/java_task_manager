@@ -31,13 +31,16 @@ public class Manager {
         return this.tasks.getOrDefault(taskType, new ArrayList<>());
     }
 
-    public List<Task> getTaskById(Integer id) {
-        List<Task> tasks = new ArrayList<>();
+    public Task getTaskById(Integer id) {
         for(TaskType taskType : this.tasks.keySet()) {
-            List<Task> tasksByType = this.tasks.get(taskType);
-            tasks.addAll(tasksByType);
+            List<Task> currentTypeTasks = this.tasks.get(taskType);
+            for(Task task : currentTypeTasks) {
+                if(task.getTaskId() == id) {
+                    return task;
+                }
+            }
         }
-        return tasks;
+        return null;
     }
 
     public void setTasksByType(TaskType taskType, List<Task> tasks) {

@@ -3,10 +3,9 @@ import java.nio.file.Path;
 import java.util.*;
 
 public class Menu {
-    public class MenuItem {
+    static class MenuItem {
         final String title;
         final Runnable handler;
-        Manager manager;
 
         public MenuItem(String title, Runnable handler) {
             this.title = title;
@@ -17,15 +16,21 @@ public class Menu {
 
     private Manager manager;
     private Scanner scanner;
+    private boolean isRunnable = true;
 
     private List<MenuItem> menuItems;
+
+    public void run() {
+        while (isRunnable) {
+            printMenu();
+        }
+    }
 
     public Menu(Manager manager, Scanner scanner) {
         this.manager = manager;
         this.scanner = scanner;
         this.menuItems = new ArrayList<>();
         createMenu();
-        printMenu();
     }
 
 
@@ -50,8 +55,12 @@ public class Menu {
 
         int input = this.scanner.nextInt();
 
-        Runnable handler = this.menuItems.get(input).handler;
-        handler.run();
+        if (input >= 0 && input < this.menuItems.size()) {
+            Runnable handler = this.menuItems.get(input).handler;
+            handler.run();
+        } else {
+            System.out.println("Неверный пункт меню");
+        }
     }
 
     private void printTaskTypeSelectionMenu() {
@@ -90,7 +99,6 @@ public class Menu {
             throw new RuntimeException(e);
         }
 
-        printMenu();
     }
 
     private void loadFile() {
@@ -100,13 +108,12 @@ public class Menu {
             throw new RuntimeException(e);
         }
 
-        printMenu();
     }
 
     public void getAllTasksByType() {
         printTaskTypeSelectionMenu();
         int input = this.scanner.nextInt();
-        Manager.TaskType tasksType = manager.getTaskTypeByNumber(input);
+        Manager.TaskType tasksType = getTaskTypeByNumber(input);
         List<Task> tasks = manager.getTasksByType(tasksType);
 
         if (tasks.size() != 0) {
@@ -114,29 +121,24 @@ public class Menu {
         } else {
             System.out.println("Нет задач по типу " + tasksType);
         }
-
-        printMenu();
     }
 
     public void removeAllTasks() {
         printTaskTypeSelectionMenu();
         int input = this.scanner.nextInt();
-        Manager.TaskType tasksType = manager.getTaskTypeByNumber(input);
+        Manager.TaskType tasksType = getTaskTypeByNumber(input);
         manager.removeAllTasksByType(tasksType);
-
         System.out.println("Все задачи по типу " + tasksType + " удалены");
-
-        printMenu();
     }
 
-    public List<Task> getResultEpicSubtasks() {
+    public List<Subtask> getResultEpicSubtasks() {
         printGetEpicSubtasksIds();
         String inputTasksIds = this.scanner.nextLine();
-        List<Task> resultSubtasks = new ArrayList<>();
+        List<Subtask> resultSubtasks = new ArrayList<>();
         Set<String> parsedTasksIds = new HashSet<>(Arrays.asList(inputTasksIds.split("\\s,\\s*")));
-        for(String id : parsedTasksIds) {
-            Task task = this.manager.getTaskById(Integer.getInteger(id));
-            resultSubtasks.add(task);
+        for (String id : parsedTasksIds) {
+            Task task = this.manager.getTaskById(Integer.parseInt(id));
+            resultSubtasks.add((Subtask) task);
         }
         return resultSubtasks;
     }
@@ -144,14 +146,27 @@ public class Menu {
     public Epic getParentEpic() {
         printGetParentEpicId();
         String inputParentEpicId = this.scanner.nextLine();
-        Task parentEpic = this.manager.getTaskById(Integer.getInteger(inputParentEpicId));
+        Task parentEpic = this.manager.getTaskById(Integer.parseInt(inputParentEpicId));
         return (Epic) parentEpic;
+    }
+
+    public Manager.TaskType getTaskTypeByNumber(int number) {
+        switch (number) {
+            case 1:
+                return Manager.TaskType.TASK;
+            case 2:
+                return Manager.TaskType.SUBTASK;
+            case 3:
+                return Manager.TaskType.EPIC;
+            default:
+                return Manager.TaskType.TASK;
+        }
     }
 
     public void createTask() {
         printTaskTypeSelectionMenu();
         int inputType = this.scanner.nextInt();
-        Manager.TaskType tasksType = manager.getTaskTypeByNumber(inputType);
+        Manager.TaskType tasksType = getTaskTypeByNumber(inputType);
         this.scanner.nextLine();
 
         printTaskNameSelectionMenu();
@@ -164,24 +179,24 @@ public class Menu {
 
         switch (tasksType) {
             case TASK:
-                newTask = new Task(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());
+                newTask = new SimpleTask(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId());
                 break;
             case EPIC:
-                List<Task> resultSubtasks = getResultEpicSubtasks();
+                List<Subtask> resultSubtasks = getResultEpicSubtasks();
                 newTask = new Epic(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId(), resultSubtasks);
                 break;
             case SUBTASK:
                 Epic parentEpic = getParentEpic();
-                newTask = new Subtask(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId(), parentEpic);
+                newTask = new Subtask(Task.TaskStatus.NEW, inputName, inputDescription, manager.generateId(), parentEpic.getId());
                 break;
         }
 
         manager.addTask(tasksType, newTask);
         printTaskSuccessAdd();
-        printMenu();
     }
 
     public void exitAppWithCode(int code) {
+        System.out.println("Вы вышли из приложения");
         System.exit(code);
     }
 }

@@ -35,7 +35,7 @@ public class Manager {
         for(TaskType taskType : this.tasks.keySet()) {
             List<Task> currentTypeTasks = this.tasks.get(taskType);
             for(Task task : currentTypeTasks) {
-                if(task.getTaskId() == id) {
+                if(task.getId() == id) {
                     return task;
                 }
             }
@@ -59,19 +59,6 @@ public class Manager {
             this.tasks.put(taskType, list);
         }
         list.add(task);
-    }
-
-    public TaskType getTaskTypeByNumber(int number) {
-        switch (number) {
-            case 1:
-                return TaskType.TASK;
-            case 2:
-                return TaskType.SUBTASK;
-            case 3:
-                return TaskType.EPIC;
-            default:
-                return TaskType.TASK;
-        }
     }
 
 

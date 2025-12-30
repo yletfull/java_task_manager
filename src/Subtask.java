@@ -1,19 +1,22 @@
 public class Subtask extends Task {
-    private Epic parentEpic;
-    public Subtask(TaskStatus status, String name, String description, int id, Epic parentEpic) {
+    private static final long serialVersionUID = 1L;
+
+    private int parentEpicId;
+    public Subtask(TaskStatus status, String name, String description, int id, int parentEpicId) {
         super(status, name, description, id);
-        this.parentEpic = parentEpic;
+        this.parentEpicId = parentEpicId;
     }
 
     public Subtask(Task task, Epic parentEpic) {
-        super(task.getStatus(), task.getName(), task.getDescription(), task.getTaskId());
+        super(task.getStatus(), task.getName(), task.getDescription(), task.getId());
+        this.parentEpicId = parentEpic.getId();
     }
 
-    public void setParentEpic(Epic parentEpic) {
-        this.parentEpic = parentEpic;
+    public void setParentEpicId(int parentEpicId) {
+        this.parentEpicId = parentEpicId;
     }
 
-   public Epic getParentEpic() {
-        return this.parentEpic;
+   public int getParentEpicId() {
+        return this.parentEpicId;
    }
 }

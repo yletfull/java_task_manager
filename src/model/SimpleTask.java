@@ -1,3 +1,5 @@
+package model;
+
 public class SimpleTask extends Task {
     private static final long serialVersionUID = 1L;
 

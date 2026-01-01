@@ -1,12 +1,8 @@
+package model;
+
 import java.io.Serializable;
 
-abstract class Task implements Serializable {
-    public enum TaskStatus {
-        NEW,
-        IN_PROGRESS,
-        DONE,
-    }
-
+public abstract class Task implements Serializable {
     private static final long serialVersionUID = 1L;
     protected final int id;
     protected String name;

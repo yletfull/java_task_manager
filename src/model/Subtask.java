@@ -1,3 +1,5 @@
+package model;
+
 public class Subtask extends Task {
     private static final long serialVersionUID = 1L;
 
@@ -16,7 +18,7 @@ public class Subtask extends Task {
         this.parentEpicId = parentEpicId;
     }
 
-   public int getParentEpicId() {
+    public int getParentEpicId() {
         return this.parentEpicId;
-   }
+    }
 }

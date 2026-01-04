@@ -1,10 +1,8 @@
 package service;
 
+import dto.CreateEpicDto;
 import dto.CreateTaskDto;
-import model.Epic;
-import model.SimpleTask;
-import model.Subtask;
-import model.Task;
+import model.*;
 import repository.TaskRepository;
 
 import java.io.*;
@@ -48,9 +46,9 @@ public class TaskService {
         }
     }
     
-    public Epic createEpic(CreateTaskDto createTaskDto) {
+    public Epic createEpic(CreateEpicDto createEpicDto) {
         int nextId = taskRepository.getNextId();
-        Epic epic = new Epic(createTaskDto.getStatus(), createTaskDto.getName(), createTaskDto.getDescription(), nextId);
+        Epic epic = new Epic(TaskStatus.NEW, createEpicDto.getName(), createEpicDto.getDescription(), nextId);
         return (Epic) taskRepository.save(epic);
     }
 

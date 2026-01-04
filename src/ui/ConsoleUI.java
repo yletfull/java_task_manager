@@ -1,5 +1,6 @@
 package ui;
 
+import dto.CreateEpicDto;
 import dto.CreateTaskDto;
 import model.*;
 import service.TaskService;
@@ -93,7 +94,18 @@ public class ConsoleUI {
     }
 
     private void createEpic() {
+        System.out.println("\n🎯 СОЗДАНИЕ ЭПИКА");
 
+        System.out.print("Введите название эпика:");
+        String name = scanner.nextLine();
+
+        System.out.print("Введите описание эпика:");
+        String description = scanner.nextLine();
+
+        CreateEpicDto dto = new CreateEpicDto(name, description);
+        Epic newEpic = taskService.createEpic(dto);
+
+        System.out.println("Создан эпик: " + newEpic);
     }
 
     private void createSimpleTask() {

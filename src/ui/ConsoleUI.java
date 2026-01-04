@@ -91,6 +91,33 @@ public class ConsoleUI {
     }
 
     private void createSubtask() {
+        System.out.println("\n📝 СОЗДАНИЕ ПОДЗАДАЧИ");
+
+        List<Epic> epics = taskService.getAllEpics();
+
+        if(epics.isEmpty()) {
+            System.out.println("❌ Нет доступных эпиков.");
+            System.out.println("Сначала создайте эпик через пункт меню 4.");
+            return;
+        }
+
+        System.out.println("\n🎯 Список текущих эпиков:");
+        epics.stream().forEach(epic -> System.out.println("   - " + epic));
+        System.out.print("Введите id родительского эпика: ");
+        int parentEpicId = choiceInteger();
+
+        System.out.print("Введите название: ");
+        String name = this.scanner.nextLine();
+
+        System.out.print("Введите описание: ");
+        String description = this.scanner.nextLine();
+
+        TaskStatus status = selectStatus();
+
+        CreateTaskDto dto = new CreateTaskDto(name, description, status, parentEpicId);
+        Subtask newSubtask = (Subtask) taskService.createTask(dto);
+
+        System.out.println("Создана подзадача: " + newSubtask);
     }
 
     private void createEpic() {

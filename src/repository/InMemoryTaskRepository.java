@@ -28,7 +28,7 @@ public class InMemoryTaskRepository implements TaskRepository {
     // Обновление или сохранение задачи
     public Task save(Task task) {
         Task savedTask;
-        boolean isNewTask = task.getId() == 0;
+        boolean isNewTask = !tasks.keySet().contains(task.getId());
         if (isNewTask) {
             int newId = getNextId();
             Task newTask = createTaskWithId(task, newId);

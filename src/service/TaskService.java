@@ -8,6 +8,7 @@ import repository.TaskRepository;
 import java.io.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 public class TaskService {
     TaskRepository taskRepository;
@@ -53,11 +54,15 @@ public class TaskService {
     }
 
     public Task getTaskById(int id) {
-        return taskRepository.findById(id).get();
+        return taskRepository.findById(id).orElseGet(null);
     }
 
     public List<Task> getAllTasks() {
         return taskRepository.findAll();
+    }
+
+    public List<Epic> getAllEpics() {
+        return this.taskRepository.findAll().stream().filter(task -> task instanceof Epic).map(task -> (Epic) task).collect(Collectors.toList());
     }
 
     public List<Task> getByType(Class<? extends Task> taskClass) {

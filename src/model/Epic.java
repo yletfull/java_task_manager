@@ -15,6 +15,10 @@ public class Epic extends Task {
         this.subtasksIds = subtasksIds;
     }
 
+    public List<Integer> getSubtasksIds() {
+        return subtasksIds;
+    }
+
     @Override
     public String toString() {
         return super.toString() + "\n Индентификаторы подзадач: " + (subtasksIds == null ? "[]" : subtasksIds);

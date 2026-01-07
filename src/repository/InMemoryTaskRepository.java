@@ -30,7 +30,7 @@ public class InMemoryTaskRepository implements TaskRepository {
         Task savedTask;
         boolean isNewTask = !tasks.keySet().contains(task.getId());
         if (isNewTask) {
-            int newId = getNextId();
+            int newId = task.getId();
             Task newTask = createTaskWithId(task, newId);
             tasks.put(newTask.getId(), newTask);
             savedTask = newTask;

@@ -2,6 +2,8 @@ package ui;
 
 import dto.CreateEpicDto;
 import dto.CreateTaskDto;
+import dto.UpdateEpicDto;
+import dto.UpdateTaskDto;
 import model.*;
 import service.TaskService;
 
@@ -86,6 +88,73 @@ public class ConsoleUI {
     }
 
     private void updateTask() {
+        System.out.print("Введите ID задачи для обновления: ");
+        int taskId = choiceInteger();
+
+        Task task = taskService.getTaskById(taskId);
+
+        if(task == null) {
+            System.out.println("Задача с ID: " + taskId + " не найдена");
+        }
+
+        System.out.println("Оставьте поле пустым, если не хотите менять старое значение");
+
+        UpdateTaskDto updateTaskDto = new UpdateTaskDto();
+        updateTaskDto.setId(task.getId());
+
+        boolean isEpic = task instanceof Epic;
+        boolean isSubtask = task instanceof Subtask;
+
+        if(isSubtask) {
+            System.out.println("Выберите новый ID родительского эпика: ");
+            String newEpicId = this.scanner.nextLine().trim();
+            if(newEpicId.isEmpty()) {
+                updateTaskDto.setEpicId(((Subtask) task).getParentEpicId());
+            } else {
+                updateTaskDto.setEpicId(Integer.parseInt(newEpicId));
+            }
+            System.out.println("Родительский эпик: " + updateTaskDto.getEpicId());
+        }
+
+        System.out.print("Введите новое название: ");
+        String name = scanner.nextLine().trim();
+        if(name.isEmpty()) {
+            updateTaskDto.setName(task.getName());
+        } else {
+            updateTaskDto.setName(name);
+        }
+        System.out.println("Имя задачи: " + updateTaskDto.getName());
+
+        System.out.print("Введите описание название: ");
+        String description = scanner.nextLine().trim();
+        if(description.isEmpty()) {
+            updateTaskDto.setDescription(task.getDescription());
+        } else {
+            updateTaskDto.setDescription(description);
+        }
+        System.out.println("Описание задачи: " + updateTaskDto.getDescription());
+
+        if(!isEpic) {
+            System.out.print("Введите новый статус: ");
+            TaskStatus status = selectStatus();
+            if(status == null) {
+                updateTaskDto.setStatus(task.getStatus());
+            } else {
+                updateTaskDto.setStatus(status);
+            }
+            System.out.println("Статус задачи: " + updateTaskDto.getEpicId());
+        }
+
+        if(isEpic) {
+            UpdateEpicDto updateEpicDto = new UpdateEpicDto();
+            updateEpicDto.setId(updateTaskDto.getId());
+            updateEpicDto.setName(updateTaskDto.getName());
+            updateEpicDto.setDescription(updateTaskDto.getDescription());
+            updateEpicDto.setSubtasksIds(((Epic) task).getSubtasksIds());
+            taskService.updateEpic(updateEpicDto);
+        } else {
+            taskService.updateTask(updateTaskDto);
+        }
     }
 
     private void createSubtask() {
@@ -216,7 +285,7 @@ public class ConsoleUI {
             case 1 -> TaskStatus.NEW;
             case 2 -> TaskStatus.IN_PROGRESS;
             case 3 -> TaskStatus.DONE;
-            default -> TaskStatus.NEW;
+            default -> null;
         };
     }
 

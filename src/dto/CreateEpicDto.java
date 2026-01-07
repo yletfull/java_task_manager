@@ -21,16 +21,6 @@ public class CreateEpicDto {
     }
 
 
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-
     public boolean isValid() {
         return name != null && !name.trim().isEmpty() && description != null;
     }

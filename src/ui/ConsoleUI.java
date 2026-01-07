@@ -24,7 +24,7 @@ public class ConsoleUI {
         while (isRunnable) {
             printMainMenu();
             int choiceMenuNumber = choiceInteger();
-            handleMeinMenuChoice(choiceMenuNumber);
+            handleMainMenuChoice(choiceMenuNumber);
         }
     }
 
@@ -37,9 +37,8 @@ public class ConsoleUI {
         System.out.println("5. 📝 Создать подзадачу");
         System.out.println("6. ✏️  Обновить задачу");
         System.out.println("7. 🗑️  Удалить задачу");
-        System.out.println("8. 📂 Показать подзадачи эпика");
-        System.out.println("9. 💾 Сохранить задачи в файл");
-        System.out.println("10. 📤 Загрузить задачи из файла");
+        System.out.println("8. 💾 Сохранить задачи в файл");
+        System.out.println("9. 📤 Загрузить задачи из файла");
         System.out.println("0. ❌ Выход");
         System.out.print("Выберите действие: ");
     }
@@ -55,7 +54,7 @@ public class ConsoleUI {
         }
     }
 
-    public void handleMeinMenuChoice(int choiceNumber) {
+    public void handleMainMenuChoice(int choiceNumber) {
         switch (choiceNumber) {
             case 1 -> showAllTasks();
             case 2 -> findTaskById();
@@ -64,9 +63,8 @@ public class ConsoleUI {
             case 5 -> createSubtask();
             case 6 -> updateTask();
             case 7 -> deleteTask();
-            case 8 -> showEpicSubtasks();
-            case 9 -> saveTasks();
-            case 10 -> loadTasks();
+            case 8 -> saveTasks();
+            case 9 -> loadTasks();
             case 0 -> exit();
             default -> System.out.println("⚠️  Неверный выбор! Попробуйте снова.");
         }

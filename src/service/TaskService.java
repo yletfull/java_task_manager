@@ -5,9 +5,9 @@ import dto.CreateTaskDto;
 import model.*;
 import repository.TaskRepository;
 
-import java.io.*;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 public class TaskService {
@@ -31,16 +31,21 @@ public class TaskService {
         if (createTaskDto.hasEpicId()) {
             // Создаём подзадачу
             Subtask subtask = new Subtask(createTaskDto.getStatus(), createTaskDto.getName(), createTaskDto.getDescription(), nextId, createTaskDto.getEpicId());
+            Task savedSubtask = taskRepository.save(subtask);
 
             // Находим эпик и добавляем в него подзадачу
             Optional<Task> maybeEpic = taskRepository.findById(subtask.getParentEpicId());
             if (maybeEpic.isPresent() && maybeEpic.get() instanceof Epic) {
                 Epic epic = (Epic) maybeEpic.get();
-                epic.addSubtaskId(epic.getId());
+                epic.addSubtaskId(subtask.getId());
+
+                TaskStatus newEpicStatus = getRecalculateEpicStatus(epic.getId());
+                epic.setStatus(newEpicStatus);
+
                 taskRepository.save(epic);
             }
 
-            return taskRepository.save(subtask);
+            return savedSubtask;
         } else {
             Task task = new SimpleTask(createTaskDto.getStatus(), createTaskDto.getName(), createTaskDto.getDescription(), nextId);
             return taskRepository.save(task);
@@ -67,5 +72,34 @@ public class TaskService {
 
     public List<Task> getByType(Class<? extends Task> taskClass) {
         return taskRepository.findByType(taskClass);
+    }
+
+    public TaskStatus getRecalculateEpicStatus (int epicId) {
+        List<Subtask> subtasks = taskRepository.findSubtasksByEpicId(epicId);
+
+        AtomicBoolean isAnyInProcessed = new AtomicBoolean(false);
+        AtomicBoolean isAllIsDone = new AtomicBoolean(true);
+
+        if(subtasks.isEmpty()) {
+            return TaskStatus.NEW;
+        }
+
+        subtasks.stream().forEach(subtask -> {
+            TaskStatus status = subtask.getStatus();
+            if(status == TaskStatus.IN_PROGRESS) {
+                isAnyInProcessed.set(true);
+                isAllIsDone.set(false);
+            } else if (status == TaskStatus.NEW) {
+                isAllIsDone.set(false);
+            }
+        });
+
+        if(isAnyInProcessed.get()) {
+            return TaskStatus.IN_PROGRESS;
+        } else if (isAllIsDone.get()) {
+            return TaskStatus.DONE;
+        }
+
+        return TaskStatus.NEW;
     }
 }

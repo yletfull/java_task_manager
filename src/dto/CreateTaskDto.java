@@ -38,22 +38,6 @@ public class CreateTaskDto {
         return epicId;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public void setStatus(TaskStatus status) {
-        this.status = status;
-    }
-
-    public void setEpicId(Integer epicId) {
-        this.epicId = epicId;
-    }
-
     public boolean isValid() {
         return name != null && !name.trim().isEmpty() && description != null && status != null;
     }

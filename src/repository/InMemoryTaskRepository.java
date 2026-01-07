@@ -69,7 +69,9 @@ public class InMemoryTaskRepository implements TaskRepository {
 
     @Override
     public List<Subtask> findSubtasksByEpicId(int epicId) {
-        return tasks.values().stream().filter(task -> task instanceof Subtask && ((Subtask) task).getParentEpicId() == epicId).map(task -> (Subtask) task).toList();
+        return tasks.values().stream()
+                .filter(task -> task instanceof Subtask && ((Subtask) task).getParentEpicId() == epicId)
+                .map(task -> (Subtask) task).toList();
     }
 
     public Task createTaskWithId(Task task, int id) {

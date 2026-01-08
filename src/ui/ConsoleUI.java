@@ -1,14 +1,13 @@
 package ui;
 
-import dto.CreateEpicDto;
-import dto.CreateTaskDto;
-import dto.UpdateEpicDto;
-import dto.UpdateTaskDto;
+import dto.EpicDto;
+import dto.TaskDto;
+import dto.EpicDto;
+import dto.TaskDto;
 import model.*;
 import service.TaskService;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.Scanner;
 
 public class ConsoleUI {
@@ -99,8 +98,8 @@ public class ConsoleUI {
 
         System.out.println("Оставьте поле пустым, если не хотите менять старое значение");
 
-        UpdateTaskDto updateTaskDto = new UpdateTaskDto();
-        updateTaskDto.setId(task.getId());
+        TaskDto taskDto = new TaskDto(task.getName(), task.getDescription(), task.getStatus());
+        taskDto.setId(task.getId());
 
         boolean isEpic = task instanceof Epic;
         boolean isSubtask = task instanceof Subtask;
@@ -109,51 +108,48 @@ public class ConsoleUI {
             System.out.println("Выберите новый ID родительского эпика: ");
             String newEpicId = this.scanner.nextLine().trim();
             if(newEpicId.isEmpty()) {
-                updateTaskDto.setEpicId(((Subtask) task).getParentEpicId());
+                taskDto.setEpicId(((Subtask) task).getParentEpicId());
             } else {
-                updateTaskDto.setEpicId(Integer.parseInt(newEpicId));
+                taskDto.setEpicId(Integer.parseInt(newEpicId));
             }
-            System.out.println("Родительский эпик: " + updateTaskDto.getEpicId());
+            System.out.println("Родительский эпик: " + taskDto.getEpicId());
         }
 
         System.out.print("Введите новое название: ");
         String name = scanner.nextLine().trim();
         if(name.isEmpty()) {
-            updateTaskDto.setName(task.getName());
+            taskDto.setName(task.getName());
         } else {
-            updateTaskDto.setName(name);
+            taskDto.setName(name);
         }
-        System.out.println("Имя задачи: " + updateTaskDto.getName());
+        System.out.println("Имя задачи: " + taskDto.getName());
 
         System.out.print("Введите описание название: ");
         String description = scanner.nextLine().trim();
         if(description.isEmpty()) {
-            updateTaskDto.setDescription(task.getDescription());
+            taskDto.setDescription(task.getDescription());
         } else {
-            updateTaskDto.setDescription(description);
+            taskDto.setDescription(description);
         }
-        System.out.println("Описание задачи: " + updateTaskDto.getDescription());
+        System.out.println("Описание задачи: " + taskDto.getDescription());
 
         if(!isEpic) {
             System.out.print("Введите новый статус: ");
             TaskStatus status = selectStatus();
             if(status == null) {
-                updateTaskDto.setStatus(task.getStatus());
+                taskDto.setStatus(task.getStatus());
             } else {
-                updateTaskDto.setStatus(status);
+                taskDto.setStatus(status);
             }
-            System.out.println("Статус задачи: " + updateTaskDto.getEpicId());
+            System.out.println("Статус задачи: " + taskDto.getEpicId());
         }
 
         if(isEpic) {
-            UpdateEpicDto updateEpicDto = new UpdateEpicDto();
-            updateEpicDto.setId(updateTaskDto.getId());
-            updateEpicDto.setName(updateTaskDto.getName());
-            updateEpicDto.setDescription(updateTaskDto.getDescription());
-            updateEpicDto.setSubtasksIds(((Epic) task).getSubtasksIds());
-            taskService.updateEpic(updateEpicDto);
+            EpicDto epicDto = new EpicDto(taskDto.getName(), task.getDescription());
+            epicDto.setId(task.getId());
+            taskService.updateEpic(epicDto);
         } else {
-            taskService.updateTask(updateTaskDto);
+            taskService.updateTask(taskDto);
         }
     }
 
@@ -181,7 +177,7 @@ public class ConsoleUI {
 
         TaskStatus status = selectStatus();
 
-        CreateTaskDto dto = new CreateTaskDto(name, description, status, parentEpicId);
+        TaskDto dto = new TaskDto(name, description, status, parentEpicId);
         Subtask newSubtask = (Subtask) taskService.createTask(dto);
 
         System.out.println("Создана подзадача: " + newSubtask);
@@ -196,7 +192,7 @@ public class ConsoleUI {
         System.out.print("Введите описание эпика:");
         String description = scanner.nextLine();
 
-        CreateEpicDto dto = new CreateEpicDto(name, description);
+        EpicDto dto = new EpicDto(name, description);
         Epic newEpic = taskService.createEpic(dto);
 
         System.out.println("Создан эпик: " + newEpic);
@@ -213,7 +209,7 @@ public class ConsoleUI {
 
         TaskStatus status = selectStatus();
 
-        CreateTaskDto dto = new CreateTaskDto(name, description, status);
+        TaskDto dto = new TaskDto(name, description, status);
         Task newTask = taskService.createTask(dto);
 
         System.out.println("Задача создана: " + newTask);

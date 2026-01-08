@@ -1,16 +1,14 @@
 package dto;
 
-import model.TaskStatus;
-
-public class CreateEpicDto {
+public class EpicDto {
     private String name;
     private String description;
+    private int id;
 
-    public CreateEpicDto(String name, String description) {
+    public EpicDto(String name, String description) {
         this.name = name;
         this.description = description;
     }
-
 
     public String getName() {
         return name;
@@ -20,15 +18,25 @@ public class CreateEpicDto {
         return description;
     }
 
-
-    public boolean isValid() {
-        return name != null && !name.trim().isEmpty() && description != null;
-    }
-
-
     @Override
     public String toString() {
         return String.format("CreateTaskDto{name='%s', description='%s'}",
                 name, description);
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
     }
 }

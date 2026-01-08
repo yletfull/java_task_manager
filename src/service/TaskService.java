@@ -1,9 +1,9 @@
 package service;
 
-import dto.CreateEpicDto;
-import dto.CreateTaskDto;
-import dto.UpdateEpicDto;
-import dto.UpdateTaskDto;
+import dto.EpicDto;
+import dto.TaskDto;
+import dto.EpicDto;
+import dto.TaskDto;
 import model.*;
 import repository.TaskRepository;
 
@@ -22,16 +22,16 @@ public class TaskService {
         return taskRepository.findSubtasksByEpicId(epicId);
     }
 
-    public Task createTask(CreateTaskDto createTaskDto) {
-        if (!createTaskDto.isValid()) {
+    public Task createTask(TaskDto taskDto) {
+        if (!taskDto.isValid()) {
             throw new IllegalArgumentException("Введены некорректные данные");
         }
 
         int nextId = taskRepository.getNextId();
 
-        if (createTaskDto.hasEpicId()) {
+        if (taskDto.hasEpicId()) {
             // Создаём подзадачу
-            Subtask subtask = new Subtask(createTaskDto.getStatus(), createTaskDto.getName(), createTaskDto.getDescription(), nextId, createTaskDto.getEpicId());
+            Subtask subtask = new Subtask(taskDto.getStatus(), taskDto.getName(), taskDto.getDescription(), nextId, taskDto.getEpicId());
             Task savedSubtask = taskRepository.save(subtask);
 
             // Находим эпик и добавляем в него подзадачу
@@ -48,18 +48,18 @@ public class TaskService {
 
             return savedSubtask;
         } else {
-            Task task = new SimpleTask(createTaskDto.getStatus(), createTaskDto.getName(), createTaskDto.getDescription(), nextId);
+            Task task = new SimpleTask(taskDto.getStatus(), taskDto.getName(), taskDto.getDescription(), nextId);
             return taskRepository.save(task);
         }
     }
 
-    public Epic createEpic(CreateEpicDto createEpicDto) {
+    public Epic createEpic(EpicDto epicDto) {
         int nextId = taskRepository.getNextId();
-        Epic epic = new Epic(TaskStatus.NEW, createEpicDto.getName(), createEpicDto.getDescription(), nextId);
+        Epic epic = new Epic(TaskStatus.NEW, epicDto.getName(), epicDto.getDescription(), nextId);
         return (Epic) taskRepository.save(epic);
     }
 
-    public Task updateTask(UpdateTaskDto updateTaskDto) {
+    public Task updateTask(TaskDto updateTaskDto) {
         Task updatedTask;
         if (updateTaskDto.hasEpicId()) {
             Subtask subtask = new Subtask(updateTaskDto.getStatus(), updateTaskDto.getName(), updateTaskDto.getDescription(), updateTaskDto.getId(), updateTaskDto.getEpicId());
@@ -84,8 +84,10 @@ public class TaskService {
         return updatedTask;
     }
 
-    public Epic updateEpic(UpdateEpicDto updateEpicDto) {
-        Epic updatedEpic = new Epic(updateEpicDto.getStatus(), updateEpicDto.getName(), updateEpicDto.getDescription(), updateEpicDto.getId(), updateEpicDto.getSubtasksIds());
+    public Epic updateEpic(EpicDto epicDto) {
+        TaskStatus epicStatus = getRecalculateEpicStatus(epicDto.getId());
+        List<Integer> subtasksIds = getSubtasksByEpicId(epicDto.getId()).stream().map(subtask -> subtask.getId()).collect(Collectors.toList());
+        Epic updatedEpic = new Epic(epicStatus, epicDto.getName(), epicDto.getDescription(), epicDto.getId(), subtasksIds);
         taskRepository.save(updatedEpic);
         return updatedEpic;
     }

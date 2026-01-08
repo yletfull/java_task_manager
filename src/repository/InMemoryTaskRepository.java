@@ -1,7 +1,6 @@
 // File: src/repository/InMemoryTaskRepository.java
 package repository;
 
-import dto.CreateTaskDto;
 import model.Epic;
 import model.SimpleTask;
 import model.Subtask;
@@ -12,7 +11,6 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 /**
  * Реализация репозитория, хранящая задачи в оперативной памяти.
